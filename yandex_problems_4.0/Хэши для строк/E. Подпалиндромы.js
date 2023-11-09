@@ -6,14 +6,6 @@ const isPalindrome = (str) => {
     const right = str.substring(isOdd ? mid + 1 : mid);
 
     return left === right.split('').reverse().join('');
-
-    // const right = str
-    //     .substring(isOdd ? mid + 1 : mid)
-    //     .split('')
-    //     .reverse()
-    //     .join('');
-
-    // return left === right;
 };
 
 var countSubstrings = function (S) {
@@ -33,6 +25,37 @@ function solution(s) {
     const l = s.length;
     let count = 0;
 
+    const prefix = [s[0].charCodeAt()];
+    const suffix = [s[s.length - 1].charCodeAt()];
+    const x = [1];
+    let X = 257;
+    const mod = 1000000007;
+
+    for (let i = 1; i < s.length; i++) {
+        prefix[i] = (prefix[i - 1] * X + s[i].charCodeAt()) % mod;
+        x[i] = (x[i - 1] * X) % mod;
+    }
+
+    for (let i = s.length - 2; i >= 0; i--) {
+        suffix.push((suffix.at(-1) * X + s[i].charCodeAt()) % mod);
+    }
+
+    function isPalindrome(from, to) {
+        const l = to - from + 1;
+        const reversL = s.length - 1 - to;
+        console.log(l);
+
+        return (
+            (prefix[to] + (suffix[s.length - 2 - to] ?? 0) * (x[to] ?? 0)) % mod ===
+            (suffix[s.length - 1 - from] + (prefix[from - 1] ?? 0) * (x[l] ?? 0)) % mod
+        );
+    }
+
+    console.log(prefix);
+    console.log(suffix);
+    console.log(x);
+    console.log('!', isPalindrome(0, 2));
+
     for (let i = 0; i < l; i++) {
         let start = 1;
         let end = Math.max(Math.min(l - i - 1, i) * 2 + 1, 1);
@@ -45,7 +68,10 @@ function solution(s) {
             }
             const half = (mid - 1) / 2;
             // console.log('i=', i, 'mid', mid);
-            if (isPalindrome(s.substring(i - half, i + half + 1))) {
+            // if (isPalindrome(s.substring(i - half, i + half + 1))) {
+            console.log(isPalindrome(i - half, i + half));
+            console.log(s.substring(i - half, i + half + 1));
+            if (isPalindrome(i - half, i + half)) {
                 // start = isEven ? mid + 2 : mid + 1;
                 start = mid + 2;
             } else {
@@ -76,10 +102,10 @@ function solution(s) {
                 // console.log('mid', mid, 'str', s, 'i', i);
                 const half = mid / 2;
 
-                const sub =
-                    mid === 2 ? s.substring(i, i + 2) : s.substring(i - half + 1, i + half + 1);
+                // const sub =
+                // mid === 2 ? s.substring(i, i + 2) : s.substring(i - half + 1, i + half + 1);
 
-                if (isPalindrome(sub)) {
+                if (mid === 2 ? isPalindrome(i, i + 1) : isPalindrome(i - half + 1, i + half)) {
                     start = mid + 2;
                 } else {
                     end = mid - 2;
@@ -114,29 +140,40 @@ function generateRandomString() {
     const characters = 'abcdefghijklmnopqrstuvwxyz';
     const charactersLength = characters.length;
 
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 10; i++) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
 
     return result;
 }
 
+const generateHash = (str) => {
+    console.log(prefix);
+    console.log(suffix);
+    console.log(x);
+    console.log(isPalindrome(2, 3));
+};
+
 function main() {
     // for (let i = 0; i < 50; i++) {
     //     const str = generateRandomString();
-    //     console.log(str);
+    //     // console.log(str);
+    //     if (solution(str) !== worked(str)) {
+    //         console.log(str);
+    //     }
     //     console.log(solution(str), worked(str));
     // }
-
+    console.log(solution('xqxqrxhebl'), worked('xqxqrxhebl'));
+    // console.log(generateHash('tbccba'));
     // console.log(manacher(`snspxpqklc`), worked(`snspxpqklc`));
-    const str = generateRandomString();
-    console.log(solution(str));
-    console.log(countSubstrings(str));
+    // const str = generateRandomString();
+    // console.log(solution(str));
+    // console.log(countSubstrings(str));
     // console.log(solution(`aaa`), worked(`aaa`));
-    // console.log(manacher(`aba`), worked(`aba`));
-    // console.log(manacher(`abba`), worked(`abba`));
-    // console.log(manacher(`abbba`), worked(`abbba`));
-    // console.log(manacher(`abbbba`), worked(`abbbba`));
+    // console.log(solution(`aba`), worked(`aba`));
+    // console.log(solution(`abba`), worked(`abba`));
+    // console.log(solution(`abbba`), worked(`abbba`));
+    // console.log(solution(`abbbba`), worked(`abbbba`));
     // console.log(manacher(`|a|b|b|a|b|b|a|`));
     // console.log(manacher(`abbabba`));
 }
