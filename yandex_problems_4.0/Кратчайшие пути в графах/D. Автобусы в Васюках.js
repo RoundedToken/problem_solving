@@ -59,31 +59,26 @@ class PriorityQueue {
 
 const solution = (input) => {
     input = input.trim().split('\n');
-    const [N, K] = input[0].trim().split(' ').map(Number);
-    const params = input[input.length - 1];
-    const roads = input.slice(1, input.length - 1);
+    const [N] = input[0].trim().split(' ').map(Number);
+    const params = input[1];
+    const roads = input.slice(3);
     const [S, F] = params.trim().split(' ').map(Number);
 
     //Формируем граф
     const graph = new Map();
 
     for (const road of roads) {
-        const [a, b, l] = road.trim().split(' ').map(Number);
-        const pairsFrom = graph.get(a);
-        const pairsTo = graph.get(b);
+        const [a, start, b, finish] = road.trim().split(' ').map(Number);
+        const routes = graph.get(a);
 
-        if (pairsFrom) {
-            pairsFrom.push([b, l]);
+        if (routes) {
+            routes.push([b, start, finish]);
         } else {
-            graph.set(a, [[b, l]]);
-        }
-
-        if (pairsTo) {
-            pairsTo.push([a, l]);
-        } else {
-            graph.set(b, [[a, l]]);
+            graph.set(a, [[b, start, finish]]);
         }
     }
+
+    console.log(graph);
 
     const minPriorityQueue = new PriorityQueue((a, b) => a[1] < b[1]);
     minPriorityQueue.push([S, 0]);
@@ -92,7 +87,7 @@ const solution = (input) => {
     dist[S] = 0;
 
     while (minPriorityQueue.size() > 0) {
-        const [minInd, minValue] = minPriorityQueue.pop();
+        const [minInd, currentTime] = minPriorityQueue.pop();
 
         if (visited.has(minInd)) {
             continue;
@@ -104,51 +99,32 @@ const solution = (input) => {
 
         if (pairs) {
             for (const pair of pairs) {
-                const [to, d] = pair;
-                const candidate = d + minValue;
+                console.log(dist);
+                const [to, start, finish] = pair;
 
-                if (candidate < dist[to]) {
-                    dist[to] = candidate;
-                    minPriorityQueue.push([to, candidate]);
+                if (finish < dist[to] && start >= currentTime) {
+                    dist[to] = finish;
+                    minPriorityQueue.push([to, finish]);
                 }
             }
         }
     }
 
+    console.log(dist);
+
     return dist[F] === Infinity ? -1 : dist[F];
 };
 
-function generateInput() {
-    let cities = 500;
-    let roads = 500;
-
-    let input = `${cities} ${roads}\n`;
-
-    for (let i = 0; i < roads; i++) {
-        let a = Math.floor(Math.random() * cities) + 1;
-        let b = Math.floor(Math.random() * cities) + 1;
-        let l = Math.floor(Math.random() * 1000000) + 1;
-
-        input += `${a} ${b} ${l}\n`;
-    }
-
-    let start = Math.floor(Math.random() * cities) + 1;
-    let end = Math.floor(Math.random() * cities) + 1;
-
-    input += `\n${start} ${end}`;
-
-    return input;
-}
-
 function main() {
-    for (let i = 0; i < 500; i++) {
-        try {
-            const input = generateInput();
-            solution(input);
-        } catch (error) {
-            console.log(error);
-        }
-    }
+    console.log(
+        solution(`3
+    1 3
+    4
+    1 0 2 5
+    1 1 2 3
+    2 3 3 5
+    1 1 3 10`)
+    );
 }
 if (require.main === module) {
     main();
