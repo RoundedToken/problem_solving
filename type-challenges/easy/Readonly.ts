@@ -1,15 +1,15 @@
 type MyReadonly<Obj> = {
-    readonly [Keys in keyof Obj]: Obj[Keys];
+  readonly [Keys in keyof Obj]: Obj[Keys];
 };
 
 interface Todo {
-    title: string;
-    description: string;
+  title: string;
+  description: string;
 }
 
 const todo: MyReadonly<Todo> = {
-    title: 'Hey',
-    description: 'foobar',
+  title: 'Hey',
+  description: 'foobar',
 };
 
 todo.title = 'Hello'; // Error: cannot reassign a readonly property

@@ -1,3 +1,4 @@
+// With strictBindCallApply on
 type Length<Tuple extends string[]> = Tuple['length'];
 
 type tesla = ['tesla', 'model 3', 'model X', 'model Y'];
